@@ -16,11 +16,11 @@ return new class extends Migration
             $table->string("name");
             $table->string("surname");
             $table->string("patronymic")->nullable();
-            $table->string("login")->unique();
-            $table->string("password");
+            $table->string("login", 32)->unique();
+            $table->string("password", 32);
             $table->date("birthday")->nullable();
             $table->string("email")->unique();
-            $table->string("telephone");
+            $table->integer("telephone");
             $table->string("api_token")->nullable();
             $table->foreignId('role_id')->constrained('roles')->onDelete('cascade');
             $table->timestamps();
