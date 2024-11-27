@@ -7,35 +7,40 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\UserCreateRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
     public function login(LoginRequest $request)
     {
-        $user = User
-            ::where('telephone',    $request->telephone)
-            ->where('password', $request->password)
-            ->first();
-
-        if (!$user) throw new ApiException(401, 'Ошибка аутентификации');
-
-        $newToken = Hash::make(microtime(true) * 1000);
-
-        $user->api_token = $newToken;
+        // Вызов исключения если такого пользователя нет в БД
+        if (!Auth::attempt($request->only('telephone', 'password'))) {
+            throw new ApiException( 'Unauthorized',401);
+        }
+        // Получение информации о текущем пользователе
+        $user = Auth::user();
+        // Генерация нового токена
+        $user->api_token = Hash::make(Str::random(60));
         $user->save();
-
+        // Ответ
         return response()->json([
-            'data' => [
-                'api_token' => $user->api_token,
-            ],
-        ]);
+            'user' => $user,
+            'token' => $user->api_token,
+        ])->setStatusCode(200);
     }
-    public function logout(Request $request) {
+
+    public function logout(Request $request)
+    {
         $user = $request->user();
-        if (!$user) throw new ApiException(401, 'Ошибка аутентификации');
-        $user->api_token = null;
-        $user->save();
+
+        if (!$user) {
+            throw new ApiException(401, 'Ошибка аутентификации');
+        }
+
+        $user->tokens()->delete();
+
         return response([
             'data' => [
                 'message' => 'Вы вышли из системы',
@@ -45,9 +50,8 @@ class AuthController extends Controller
 
     public function register(UserCreateRequest $request)
     {
-        // Создаем нового пользователя с предоставленными данными
-        $user = new User($request->validated());
-        $user->save();
+        $validatedData = $request->validated();
+        $user = User::create($validatedData);
 
         return response()->json([
             'message' => 'Регистрация прошла успешно',
