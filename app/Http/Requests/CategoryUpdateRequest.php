@@ -11,7 +11,7 @@ class CategoryUpdateRequest extends ApiRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**

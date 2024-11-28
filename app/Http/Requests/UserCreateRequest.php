@@ -27,7 +27,7 @@ class UserCreateRequest extends ApiRequest
             'login'         => 'required|string|min:3|max:32',
             'password'      => 'required|string|min:5|max:32',
             'email'         => 'required|email',
-            'telephone'     => 'required|string|min:1|max:11',
+            'telephone'     => 'required|string|min:1|max:15',
         ];
     }
     public function messages()

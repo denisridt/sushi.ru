@@ -36,12 +36,10 @@ class User extends Authenticatable
         static::creating(function ($user) {
             // Пример: задаем роль по умолчанию, если не указана
             if (!$user->role_id) {
-                $user->role_id = 1; // Устанавливаем роль по умолчанию, например, роль с id = 1
+                $user->role_id = 2; // Устанавливаем роль по умолчанию, например, роль с id = 1
             }
         });
     }
-
-
 
     // Аксессор для пароля, чтобы всегда хэшировать его при сохранении
     public function setPasswordAttribute($value)

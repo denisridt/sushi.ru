@@ -8,6 +8,7 @@ use App\Http\Requests\ProductUpdateRequest;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
+
 class ProductController extends Controller
 {
     public function  index(){
@@ -20,13 +21,14 @@ class ProductController extends Controller
     {
         $products = Product::find($id);
         if (!$products) {
-            throw new ApiException(404, 'Товар не найден');
+            throw new ApiException('Товар не найден', 404);
         }
         return response(['data' => $products]);
     }
 
     public function create(ProductCreateRequest $request)
     {
+
         // Загрузка файла изображения
         $imageName = time() . '.' . $request->photo->extension();
 
@@ -42,7 +44,7 @@ class ProductController extends Controller
     public function destroy($id){
         $product = Product::find($id);
         if (!$product) {
-            throw new ApiException(404, 'Продукт не найден');
+            throw new ApiException('Продукт не найден', 404);
         }
         $product->delete();
         return response()->json(['message' => 'Продукт успешно удален'], 200);
@@ -53,12 +55,12 @@ class ProductController extends Controller
         // Поиск продукта по id
         $products = Product::find($id);
         if (!$products) {
-            throw new ApiException(404, 'Товар не найден');
+            throw new ApiException('Товар не найден', 404);
         }
         // Проверяем, есть ли продукт с таким именем уже в базе данных
         $existingProduct = Product::where('name', $request->input('name'))->first();
         if ($existingProduct) {
-            throw new ApiException(422, 'Продукт с таким именем уже существует');
+            throw new ApiException('Продукт с таким именем уже существует', 422);
         }
         // Если файл был загружен, сохраняем его и обновляем путь к фото
         if ($request->hasFile('photo')) {

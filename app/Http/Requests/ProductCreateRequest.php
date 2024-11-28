@@ -12,7 +12,7 @@ class ProductCreateRequest extends ApiRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**

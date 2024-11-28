@@ -8,6 +8,7 @@ use App\Http\Requests\CategoryUpdateRequest;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CategoryController extends Controller
 {
@@ -26,7 +27,7 @@ class CategoryController extends Controller
     {
         $existingCategory = Category::where('name', $request->input('name'))->first();
         if ($existingCategory) {
-            throw new ApiException(422, 'Категория с таким именем уже существует');
+            throw new ApiException('Категория с таким именем уже существует',422 );
         }
         // Создаем новую категорию
         $category = new Category([
@@ -37,9 +38,10 @@ class CategoryController extends Controller
     }
 
     public function destroy($id){
+
         $categories = Category::find($id);
         if (!$categories) {
-            throw new ApiException(404, 'Категория не найдена');
+            throw new ApiException('Категория не найдена',404 );
         }
         $categories->delete();
         return response()->json(['message' => 'Категория успешно удалена'], 200);
@@ -48,23 +50,28 @@ class CategoryController extends Controller
 
     public function update(CategoryUpdateRequest $request, $id)
     {
+
         // Поиск категории по id
         $categories = Category::find($id);
         if (!$categories) {
-            throw new ApiException(404, 'Категория не найдена');
+            throw new ApiException('Категория не найдена',404 );
         }
+
 
         // Проверяем, есть ли категория с таким именем уже в базе данных
         $existingProduct = Category::where('name', $request->input('name'))->first();
         if ($existingProduct) {
-            throw new ApiException(422, 'Категория с таким именем уже существует');
+            throw new ApiException('Категория с таким именем уже существует',422 );
         }
+
+
 
         // Обновление атрибутов категории
         $categories->name = $request->input('name');
 
         // Сохранение изменений в базе данных
         $categories->save();
+
 
         // Возврат успешного ответа
         return response()->json(['message' => 'Категория успешно обновлена'], 200);
